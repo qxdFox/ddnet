@@ -2,6 +2,8 @@
 
 #include <game/mapitems.h>
 
+#include <engine/shared/datafile.h>
+
 CEditorImage::CEditorImage(CEditorMap *pMap) :
 	CMapObject(pMap),
 	m_Automapper(pMap)
@@ -54,12 +56,19 @@ void CEditorImage::Free()
 {
 	Graphics()->UnloadTexture(&m_Texture);
 	m_Automapper.Unload();
+	m_CompressedSize = 0;
 	CImageInfo::Free();
+}
+
+void CEditorImage::UpdateCompressedSize()
+{
+	m_CompressedSize = CDataFileWriter::GetCompressedDataSize(DataSize(), m_pData);
 }
 
 CEditorImage &CEditorImage::operator=(CImageInfo &&Other)
 {
 	CImageInfo *pThis = this;
 	*pThis = std::move(Other);
+	UpdateCompressedSize();
 	return *this;
 }
